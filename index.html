@@ -1,0 +1,40 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<title>Clocks</title>
+</head>
+
+<body>
+<h1>Clocks</h1>
+
+<p>The initial inspiration for this concept sprung from the desire to have a better visual representation of how busy I am over the next several days.  I wanted to have bubbles of activities (pulled from Google Calendar API) that auto-cycled into a viewfinder so with one glance I could tell how busy I would be over the next few hours, days, etc.  In order to do that, I'd first need to have a visual device for cycling the activities.  The original intent of this "clocks" project was to experiment with some concepts for that visual device.</p>
+
+<h2><a href="v1.html">V1.</a></h2>
+<p>Initially, I simply wanted to break down the basic elements of the design so I could look at them in one place and begin to think about the specifics of how to reuse them.  The basic idea was to split the time units into separate visual representations, then change the frame of reference to be relative to something unconventional.  In this case, the hand representing the unit for each clock is kept vertical while the clock face turns.  It's as if we are watching the clock "from the perspective" of the hand.</p>
+
+<p>In an effort to not totally lose the viewer with this strange format, I wanted to keep some references back to the standard analog clock.  First, a darker bar was placed around the outside to give a frame of reference back to a standard clock where the "12" is always pointing up.  Second, the hands are sized and colored to match their physical counterparts.</p>
+
+<h2><a href="v2.html">V2.</a></h2>
+<p>To further solidify and find some clarity in the relationship between the various clocks and hands, I added the non-framing hands to each clock as well.  I also added a "normal" clock to the mix to allow for some interesting comparisons and contrasts.  This was a bit cluttered, so the hands would be removed going forward since the relationships were solidified in my mind.</p>
+
+<h2><a href="v3.html">V3.</a></h2>
+<p>In an attempt to transform into something closer to the original concept, I repositioned the clocks in a stacked arrangement to prepare for any rotation around each other that may occur.  I also scaled the clocks to give a sense as to which clock represents the "larger" units (the largest clock).  However, this resulted in to most active components being visually minimized - in short, a stagnant-looking composition.</p>
+
+<h2><a href="v4.html">V4.</a></h2>
+<p>To solve the issues presented by V3, I swapped the sizes of the clocks.  I made the the most active portion the largest, and the least active the smallest.  This still was forcing the least active to be mostly ignored, so I decided to stack them along the "z-axis" in an effort to bring equal attention to each.</p>
+
+<p>This worked quite nicely - after minimal sizing adjustment, the clocks stacked without getting in the way of each others' features.  The dark "progress bars" give the effect of "filling up" until noon, then "emptying out" until midnight.  Since I had finished V4 just shy of midnight, I thought it worked as a cool countdown.</p>
+
+<h2><a href="v5.html">V5.</a></h2>
+<p>This is V4 with the hands added back in for experimentation.  I like the complexity that is added, but don't think that this will be used for the final concept.</p>
+
+<h2><a href="v6.html">V6.</a></h2>
+<p>At the time of finishing V4, I had neglected that the modulo by 12 (to maintain a 12-hour clock) would reverse in the morning and evening.  So by changing the sign on a couple of operations, this version simply empties out until noon and fills up until midnight.</p>
+
+<p>A further update was to smooth the effect of "refilling" a unit by "borrowing from" the unit above.  In V4, the higher unit would decrement one step earlier than the refill of the lesser unit.  Now these happen simultaneously.</p>
+
+<h2>Future Iterations</h2>
+<p>Currently it is not exactly obvious that the higher units are decrementing, so perhaps a potential improvement for the next iteration would be to highlight that borrowing in some way - either by showing a flow from an inner circle to the other, or using a bright flash on the inner circle's portion that's decremented.</p>
+
+<p>One other suggestion was to add numbers to make this more functional than conceptual.  While this would probably improve the marketability of this concept for practical and commercial uses (store sale countdowns, large displays, etc), I currently prefer the simplicity of indicator marks without numerals.  Perhaps I'll change my mind at a later point on this.</p>
+</body>

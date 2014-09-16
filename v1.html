@@ -1,0 +1,201 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <style>
+      body {
+        margin: 0px;
+        padding: 0px;
+      }
+    </style>
+  </head>
+  <body>
+    
+    <div width="460" height="150" style="width: 460px; margin: 50px auto;">
+	  <canvas id="h" width="150" height="150"></canvas>
+      <canvas id="m" width="150" height="150"></canvas>
+      <canvas id="s" width="150" height="150"></canvas>
+    </div>
+    
+    <script>
+      /* Declare globals */
+      var hCanvas = document.getElementById('h');
+      var mCanvas = document.getElementById('m');
+      var sCanvas = document.getElementById('s');
+      var hContext = hCanvas.getContext('2d');
+      var mContext = mCanvas.getContext('2d');
+      var sContext = sCanvas.getContext('2d');
+      var centerX = sCanvas.width / 2;
+      var centerY = sCanvas.height / 2;
+      var radius = 70;
+
+      /* Draw it */
+      drawClocks();
+      
+      function drawClocks()
+      {
+      	setInterval(drawRotatedSecondClock, 1000);
+      }
+      
+      var hRot;
+      var hDelt = Math.PI / 6;
+      function drawRotatedHourClock()
+      {
+      	var hrs = new Date().getHours();
+      	if (!hRot) {
+			hRot = (hrs % 12) * hDelt;
+		} else {
+      		hRot = hDelt;
+      	}
+      	
+      	hContext.translate(centerX,centerY);
+      	hContext.rotate(-hRot);
+      	hContext.translate(-centerX,-centerY);
+      	
+      	drawClockFace(hContext);
+      	drawProgressArc(hContext, (hrs % 12) * hDelt);
+      	drawHand(hContext, (hrs % 12) * hDelt);
+      }
+      
+      var mRot; 
+      var mDelt = Math.PI / 30;
+      function drawRotatedMinuteClock()
+      {
+      	var min = new Date().getMinutes();
+      	if (min == 0 || !mRot) {
+      		drawRotatedHourClock();
+      	}
+      	
+      	if (!mRot) {
+	      	mRot = min * mDelt;
+	    } else {
+	    	mRot = mDelt;
+	    }
+      	
+      	mContext.translate(centerX,centerY);
+      	mContext.rotate(-mRot);
+      	mContext.translate(-centerX,-centerY);
+      	
+      	drawClockFace(mContext);
+      	drawProgressArc(mContext, min * mDelt);
+      	drawHand(mContext, min * mDelt);
+      }
+      
+      var sRot;
+      var sDelt = Math.PI / 30; 
+      function drawRotatedSecondClock()
+      {
+      	var date = new Date();
+      	var sec = date.getSeconds();
+      	if (sec == 0 || !sRot) {
+      		drawRotatedMinuteClock();
+      	}
+      	
+      	if (!sRot) {
+			sRot = sec * sDelt;
+		} else {
+			sRot = sDelt;
+		}
+		
+		/* Draw minute hand */
+		var min = date.getMinutes();
+		sContext.beginPath();
+		sContext.moveTo(centerX,centerY);
+      	
+      	sContext.translate(centerX,centerY);
+      	sContext.rotate(-sRot);
+      	sContext.translate(-centerX,-centerY);
+      	
+      	drawClockFace(sContext);
+      	drawProgressArc(sContext, sec * sDelt);
+      	drawHand(sContext, sec * sDelt);
+      }
+      
+      function drawClockFace(ctx)
+      {
+		ctx.beginPath();
+      	ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI, false);
+      	ctx.fillStyle = '#eeeeee';
+      	ctx.fill();
+      	ctx.lineWidth = 3;
+      	ctx.strokeStyle = '#dddddd';
+      	ctx.stroke();
+      
+      	for (var i=0; i<=60; i=i+1) {
+       		drawIndicatorMarks(ctx, i);
+       	}
+      }
+      
+      function drawProgressArc(ctx, rad)
+      {
+      	var progBarWidth = 8;
+      	
+      	var rotRad = rad - Math.PI/2;
+      	ctx.beginPath();
+      	ctx.arc(centerX, centerY, radius-progBarWidth/2, -Math.PI/2, rotRad, false);
+      	ctx.lineWidth = progBarWidth;
+      	ctx.strokeStyle = '#bbbbbb';
+      	ctx.stroke();
+      }
+      
+      function drawHand(ctx, rad)
+      {
+      	var scale;
+      	var color;
+      	if (ctx.canvas.id == "h") {
+      		scale = 0.4;
+      		color = "#333333";
+      	} else if (ctx.canvas.id == "m") {
+      		scale = 0.9;
+      		color = "#333333";
+      	} else if (ctx.canvas.id == "s") {
+      		scale = 1;
+      		color = '#ff3333';
+      	}      	
+      	
+      	ctx.beginPath();
+      	ctx.moveTo(centerX, centerY);
+      	var endX = centerX + radius * scale * Math.sin(rad);
+		var endY = centerY - radius * scale * Math.cos(rad);
+      	ctx.lineTo(endX, endY);
+      	ctx.lineWidth=1;
+      	ctx.strokeStyle= color;
+      	ctx.stroke();
+      }
+      
+      function drawIndicatorMarks(ctx, sec)
+      {
+      	/* Calculate the angle of the line */
+		var rad = sec / 30 * Math.PI;
+      
+		/* Set the offset for the length of the line */
+		var offset;
+		if (sec == 0) {
+			offset = 0.2;
+		} else if (sec % 15 == 0) {
+			offset = 0.2;
+		} else if (sec % 5 == 0) {
+			offset = 0.2;
+		} else {
+			offset = 0.1;
+		}
+		
+		offset = 1-offset;
+		var startX = centerX + offset * radius * Math.sin(rad);
+		var startY = centerY - offset * radius * Math.cos(rad);
+		
+		/* Move the cursor */
+      	ctx.moveTo(startX, startY);
+      	
+		/* Calculate the position to draw to */
+		var endX = centerX + radius * Math.sin(rad);
+		var endY = centerY - radius * Math.cos(rad);
+		
+		/* Draw the line */
+	    ctx.lineTo(endX,endY);
+		ctx.lineWidth = 1;
+		ctx.strokeStyle = '#dddddd';
+		ctx.stroke();
+      }
+    </script>
+  </body>
+</html>

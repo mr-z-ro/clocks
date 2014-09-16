@@ -1,0 +1,204 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <style>
+      body {
+        margin: 0px;
+        padding: 0px;
+      }
+    </style>
+  </head>
+  <body>
+    
+    <div style="text-align: center;">
+      <canvas id="s" width="750" height="750"></canvas><br />
+      <canvas id="m" width="400" height="400" style="position:relative; top: -580px;"></canvas><br />
+	  <canvas id="h" width="100" height="100" style="position:relative; top: -840px;"></canvas>
+    </div>
+    
+    <script>
+      /* Declare globals */
+      var hCanvas = document.getElementById('h');
+      var mCanvas = document.getElementById('m');
+      var sCanvas = document.getElementById('s');
+      var hContext = hCanvas.getContext('2d');
+      var mContext = mCanvas.getContext('2d');
+      var sContext = sCanvas.getContext('2d');
+      var radius = 16;
+
+      /* Draw it */
+      setInterval(drawRotatedSecondClock, 1000);
+      
+      var hRot;
+      var hDelt = Math.PI / 6;
+      function drawRotatedHourClock(hrs, min, sec)
+      {
+      	var date = new Date();
+      	var sec = date.getSeconds();
+		var min = date.getMinutes();
+		var hrs = date.getHours() % 12;
+		var scale = 2;
+		
+      	hContext.translate(hContext.canvas.width / 2,hContext.canvas.height / 2);
+      	if (!hRot) {
+			hRot = hrs * hDelt;
+			hContext.rotate(-hRot);
+		} else if (min % 60 == 0 && sec % 60 == 0) {
+      		hRot = hDelt;
+	      	hContext.rotate(-hRot);
+      	}
+      	hContext.translate(-hContext.canvas.width / 2,-hContext.canvas.height / 2);
+      	
+      	drawClockFace(hContext, scale);
+      	drawProgressArc(hContext, hrs * hDelt, scale);
+      	
+      	//drawHand(hContext, "s", sec * sDelt, scale);
+      	//drawHand(hContext, "m", min * mDelt, scale);
+      	drawHand(hContext, "h", hrs * hDelt, scale);
+      }
+      
+      var mRot; 
+      var mDelt = Math.PI / 30;
+      function drawRotatedMinuteClock(hrs, min, sec)
+      {
+      	var scale = 8;
+      	
+      	mContext.translate(mContext.canvas.width / 2,mContext.canvas.height / 2);
+      	if (!mRot) {
+	      	mRot = min * mDelt;      	
+		    mContext.rotate(-mRot);
+	    } else if (sec % 60 == 0) {
+	    	mRot = mDelt;
+	    	mContext.rotate(-mRot);
+	    }
+      	mContext.translate(-mContext.canvas.width / 2,-mContext.canvas.height / 2);
+      	
+      	drawClockFace(mContext, scale);
+      	drawProgressArc(mContext, min * mDelt, scale);
+
+		//drawHand(mContext, "s", sec * sDelt, scale);
+      	drawHand(mContext, "m", min * mDelt, scale);
+      	//drawHand(mContext, "h", hrs * hDelt, scale);
+      	
+      	drawRotatedHourClock(hrs, min, sec);
+      }
+      
+      var sRot;
+      var sDelt = Math.PI / 30; 
+      function drawRotatedSecondClock()
+      {
+      	var date = new Date();
+      	var sec = date.getSeconds();
+		var min = date.getMinutes();
+		var hrs = date.getHours();
+		var scale = 16;
+      	
+      	if (!sRot) {
+			sRot = sec * sDelt;
+		} else {
+			sRot = sDelt;
+		}
+      	
+      	sContext.translate(sContext.canvas.width / 2,sContext.canvas.height / 2);
+      	sContext.rotate(-sRot);
+      	sContext.translate(-sContext.canvas.width / 2,-sContext.canvas.height / 2);
+      	
+      	drawClockFace(sContext, scale);
+      	drawProgressArc(sContext, sec * sDelt, scale);
+      	
+      	drawHand(sContext, "s", sec * sDelt, scale);
+      	//drawHand(sContext, "m", min * mDelt, scale);
+      	//drawHand(sContext, "h", hrs * hDelt, scale);
+      	
+      	drawRotatedMinuteClock(hrs, min, sec);
+      }
+      
+      function drawClockFace(ctx, scale)
+      {
+		ctx.beginPath();
+      	ctx.arc(ctx.canvas.width / 2, ctx.canvas.height / 2, scale*radius, 0, 2 * Math.PI, false);
+      	ctx.fillStyle = '#eeeeee';
+      	ctx.fill();
+      	ctx.lineWidth = 1;
+      	ctx.strokeStyle = '#dddddd';
+      	ctx.stroke();
+      
+      	for (var i=0; i<=60; i=i+1) {
+       		drawIndicatorMarks(ctx, i, scale);
+       	}
+      }
+      
+      function drawProgressArc(ctx, rad, scale)
+      {
+      	var progBarWidth = 2 * scale;
+      	
+      	var rotRad = rad - Math.PI/2;
+      	ctx.beginPath();
+      	ctx.arc(ctx.canvas.width / 2, ctx.canvas.height / 2, radius*scale-progBarWidth/2, -Math.PI/2, rotRad, false);
+      	ctx.lineWidth = progBarWidth;
+      	ctx.strokeStyle = '#bbbbbb';
+      	ctx.stroke();
+      }
+      
+      function drawHand(ctx, handId, rad, scale)
+      {
+      	var lengthScale;
+      	var color;
+      	if (handId == "h") {
+      		lengthScale = 0.4 * scale;
+      		color = "#333333";
+      	} else if (handId == "m") {
+      		lengthScale = 0.9 * scale;
+      		color = "#333333";
+      	} else if (handId == "s") {
+      		lengthScale = 1 * scale;
+      		color = '#ff3333';
+      	}      	
+      	
+      	ctx.beginPath();
+      	ctx.moveTo(ctx.canvas.width / 2, ctx.canvas.height / 2);
+      	var endX = ctx.canvas.width / 2 + radius * lengthScale * Math.sin(rad);
+		var endY = ctx.canvas.height / 2 - radius * lengthScale * Math.cos(rad);
+      	ctx.lineTo(endX, endY);
+      	ctx.lineWidth=1;
+      	ctx.strokeStyle= color;
+      	ctx.stroke();
+      }
+      
+      function drawIndicatorMarks(ctx, sec, scale)
+      {
+      	/* Calculate the angle of the line */
+		var rad = sec / 30 * Math.PI;
+      
+		/* Set the offset for the length of the line */
+		var offset;
+		if (sec == 0) {
+			offset = 0.2;
+		} else if (sec % 15 == 0) {
+			offset = 0.2;
+		} else if (sec % 5 == 0) {
+			offset = 0.2;
+		} else {
+			offset = 0.1;
+		}
+		
+		offset = 1-offset;
+		var startX = ctx.canvas.width / 2 + offset * radius * scale * Math.sin(rad);
+		var startY = ctx.canvas.height / 2 - offset * radius * scale * Math.cos(rad);
+		
+		/* Move the cursor */
+      	ctx.moveTo(startX, startY);
+      	
+		/* Calculate the position to draw to */
+		var endX = ctx.canvas.width / 2 + radius * scale * Math.sin(rad);
+		var endY = ctx.canvas.height / 2 - radius * scale * Math.cos(rad);
+		
+		/* Draw the line */
+	    ctx.lineTo(endX,endY);
+		ctx.lineWidth = 1;
+		ctx.strokeStyle = '#dddddd';
+		ctx.stroke();
+      }
+    </script>
+  </body>
+</html>
